@@ -1,5 +1,5 @@
 #include "StartScene.h"
-
+#include<math.h>
 USING_NS_CC;
 
 Scene* Start::createScene()
@@ -73,65 +73,23 @@ bool Start::onTouchBegan(Touch* touch, Event* event)
 void Start::onTouchMoved(Touch *touch, Event *event)
 {
 	log("onTouchMoved");
-	Vec2 touchLocation = touch->getLocation();
-	log("touchLocation (%f ,%f) ", touchLocation.x, touchLocation.y);
+	//Vec2 touchLocation = touch->getLocation();
+	//log("touchLocation (%f ,%f) ", touchLocation.x, touchLocation.y);
+	//Vec2 playerPos = _player->getPosition();
+	//Vec2 diff = touchLocation - playerPos;
+	//playerPos.x += _tileMap->getTileSize().width*diff.x/sqrt(diff.x*diff.x+diff.y*diff.y);
+	//playerPos.y += _tileMap->getTileSize().height*diff.y / sqrt(diff.x*diff.x + diff.y*diff.y);
 
-	Vec2 playerPos = _player->getPosition();
-	Vec2 diff = touchLocation - playerPos;
+	//log("playerPos (%f ,%f) ", playerPos.x, playerPos.y);
+	//this->setPlayerPosition(playerPos);
 
-	if (abs(diff.x) > abs(diff.y)) {
-		if (diff.x > 0) {
-			playerPos.x += _tileMap->getTileSize().width;
-			_player->runAction(FlipX::create(false));
-		}
-		else {
-			playerPos.x -= _tileMap->getTileSize().width;
-			_player->runAction(FlipX::create(true));
-		}
-	}
-	else {
-		if (diff.y > 0) {
-			playerPos.y += _tileMap->getTileSize().height;
-		}
-		else {
-			playerPos.y -= _tileMap->getTileSize().height;
-		}
-	}
-	log("playerPos (%f ,%f) ", playerPos.x, playerPos.y);
-	this->setPlayerPosition(playerPos);
-	this->setViewpointCenter(_player->getPosition());
 }
 
 void Start::onTouchEnded(Touch *touch, Event *event)
 {
 	log("onTouchEnded");
 	Vec2 touchLocation = touch->getLocation();
-	log("touchLocation (%f ,%f) ", touchLocation.x, touchLocation.y);
-
-	Vec2 playerPos = _player->getPosition();
-	Vec2 diff = touchLocation - playerPos;
-
-	if (abs(diff.x) > abs(diff.y)) {
-		if (diff.x > 0) {
-			playerPos.x += _tileMap->getTileSize().width;
-			_player->runAction(FlipX::create(false));
-		}
-		else {
-			playerPos.x -= _tileMap->getTileSize().width;
-			_player->runAction(FlipX::create(true));
-		}
-	}
-	else {
-		if (diff.y > 0) {
-			playerPos.y += _tileMap->getTileSize().height;
-		}
-		else {
-			playerPos.y -= _tileMap->getTileSize().height;
-		}
-	}
-	log("playerPos (%f ,%f) ", playerPos.x, playerPos.y);
-	this->setPlayerPosition(playerPos);
-	this->setViewpointCenter(_player->getPosition());
+	_player->runAction(MoveTo::create(0.5, touchLocation));
 }
 void Start::setPlayerPosition(Vec2 position)
 {
@@ -160,30 +118,3 @@ Vec2 Start::tileCoordFromPosition(Vec2 pos)
 	return Vec2(x, y);
 }
 
-void Start::setViewpointCenter(Vec2 position)
-{
-	log("setViewpointCenter");
-
-	log("position (%f ,%f) ", position.x, position.y);
-
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-	int x = MAX(position.x, visibleSize.width / 2);
-	int y = MAX(position.y, visibleSize.height / 2);
-
-	x = MIN(x, (_tileMap->getMapSize().width * _tileMap->getTileSize().width)
-		- visibleSize.width / 2);
-	y = MIN(y, (_tileMap->getMapSize().height * _tileMap->getTileSize().height)
-		- visibleSize.height / 2);
-
-
-	Vec2 pointA = Vec2(visibleSize.width / 2, visibleSize.height / 2);
-
-	Vec2 pointB = Vec2(x, y);
-	log(" (%f ,%f) ", pointB.x, pointB.y);
-
-
-	Vec2 offset = pointA - pointB;
-	log("offset (%f ,%f) ", offset.x, offset.y);
-	this->setPosition(offset);
-
-}
