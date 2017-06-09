@@ -1,12 +1,13 @@
 #include "StartScene.h"
-#include<math.h>
 USING_NS_CC;
 
 Scene* Start::createScene()
 {
 	// 'scene' is an autorelease object
-	auto scene = Scene::create();
-
+	auto scene = Scene::createWithPhysics();
+	//phyWorld->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	PhysicsWorld* phyWorld = scene->getPhysicsWorld();
+	phyWorld->setGravity(Vect(0, 0));
 	// 'layer' is an autorelease object
 	auto layer = Start::create();
 
@@ -26,9 +27,19 @@ bool Start::init()
 	{
 		return false;
 	}
-
+	
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	Size edgeSize;
+	edgeSize.height = visibleSize.height*1.3;
+	edgeSize.width = visibleSize.width*1.2;
+	//物理边界
+	auto body = PhysicsBody::createEdgeBox(edgeSize
+		, PHYSICSBODY_MATERIAL_DEFAULT, 300.0f);
+	auto edgeNode = Node::create();
+	edgeNode->setPosition(Vec2(visibleSize.width / 2, visibleSize.height / 2));
+	edgeNode->setPhysicsBody(body);
+	this->addChild(edgeNode);
 	//设置瓦片地图
 	_tileMap = TMXTiledMap::create("Map.tmx");
 	addChild(_tileMap, 0, 100);
@@ -40,6 +51,10 @@ bool Start::init()
 	float y = spawnPoint["y"].asFloat();
 
 	_player = Sprite::create("ball.png");
+	//设置物体的物理属性
+	auto body2 = PhysicsBody::createCircle(_player->getContentSize().width / 2);
+	_player->setPhysicsBody(body2);
+
 	_player->setPosition(Vec2(x, y));
 	addChild(_player, 2, 200);
 	_collidable = _tileMap->getLayer("collidable");
@@ -56,6 +71,8 @@ bool Start::init()
 	//鼠标控制
 	setTouchEnabled(true);
 	setTouchMode(Touch::DispatchMode::ONE_BY_ONE);
+	//键盘控制
+	Start::keyboard();
 
 	return true;
 }
@@ -67,12 +84,14 @@ void Start::menuCloseCallback(Ref *pSender)
 bool Start::onTouchBegan(Touch* touch, Event* event)
 {
 	log("onTouchBegan");
+	_player->stopAllActions();
 	return true;
 }
 
 void Start::onTouchMoved(Touch *touch, Event *event)
 {
 	log("onTouchMoved");
+	
 	//Vec2 touchLocation = touch->getLocation();
 	//log("touchLocation (%f ,%f) ", touchLocation.x, touchLocation.y);
 	//Vec2 playerPos = _player->getPosition();
@@ -89,8 +108,88 @@ void Start::onTouchEnded(Touch *touch, Event *event)
 {
 	log("onTouchEnded");
 	Vec2 touchLocation = touch->getLocation();
-	_player->runAction(MoveTo::create(0.5, touchLocation));
+	Vec2 playerPos = _player->getPosition();
+	Vec2 diff = touchLocation - playerPos;
+	Vec2 moveLocation;
+	moveLocation.x= diff.x / sqrt(diff.x*diff.x + diff.y*diff.y);
+	moveLocation.y= diff.y / sqrt(diff.x*diff.x + diff.y*diff.y);
+	float moveSpeed = 500;
+	FiniteTimeAction* ac1 = (FiniteTimeAction*)MoveTo::create(2, playerPos+2*moveLocation*moveSpeed);
+	ActionInterval *ac = Sequence::create(ac1, NULL);
+	_player->runAction(Speed::create(ac,1.0));
 }
+
+void Start::keyboard()
+{
+	Layer::onEnter();
+	log("Start keyboard");
+	auto listener = EventListenerKeyboard::create();
+	listener->onKeyPressed = [&](EventKeyboard::KeyCode keycode, Event* event)
+	{
+		Vec2 playerPos = _player->getPosition();
+		switch (keycode) {
+		case EventKeyboard::KeyCode::KEY_UP_ARROW: {
+			Vec2 moveSpeedUp;
+			moveSpeedUp.x = 0;
+			moveSpeedUp.y = 500;
+			moveUp = MoveTo::create(10, 10 * moveSpeedUp + playerPos);
+			_player->runAction(moveUp);
+			break;
+		}
+		case EventKeyboard::KeyCode::KEY_DOWN_ARROW: {
+			Vec2 moveSpeedDown;
+			moveSpeedDown.x = 0;
+			moveSpeedDown.y = -500;
+			moveDown = MoveTo::create(10, 10 * moveSpeedDown + playerPos);
+			_player->runAction(moveDown);
+			break;
+		}
+		case EventKeyboard::KeyCode::KEY_LEFT_ARROW: {
+			Vec2 moveSpeedLeft;
+			moveSpeedLeft.x = -500;
+			moveSpeedLeft.y = 0;
+			moveLeft = MoveTo::create(10, 10 * moveSpeedLeft + playerPos);
+			_player->runAction(moveLeft);
+			break;
+		}
+		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW: {
+			Vec2 moveSpeedRight;
+			moveSpeedRight.x = 500;
+			moveSpeedRight.y = 0;
+			moveRight = MoveTo::create(10, 10 * moveSpeedRight + playerPos);
+			_player->runAction(moveRight);
+			break;
+		}
+
+
+		}
+	};
+
+	listener->onKeyReleased = [&](EventKeyboard::KeyCode keycode, Event* event) {
+		switch (keycode) {
+		case EventKeyboard::KeyCode::KEY_UP_ARROW: {
+			_player->stopAction(moveUp);
+			break;
+			}
+		case EventKeyboard::KeyCode::KEY_DOWN_ARROW: {
+			_player->stopAction(moveDown);
+			break;
+		}
+		case EventKeyboard::KeyCode::KEY_LEFT_ARROW: {
+			_player->stopAction(moveLeft);
+			break;
+		}
+		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW: {
+			_player->stopAction(moveRight);
+			break;
+		}
+		}
+
+	};
+	EventDispatcher* eventDispatcher = Director::getInstance()->getEventDispatcher();
+	eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+}
+
 void Start::setPlayerPosition(Vec2 position)
 {
 	Vec2 tileCoord = this->tileCoordFromPosition(position);
