@@ -22,8 +22,9 @@ void ball::ballinit(const char *_ptr,int Tag)
 	auto _player = Sprite::create(_ptr);
 	_player->setTag(Tag);
 	auto body = PhysicsBody::createCircle(_player->getContentSize().width / 2);
-	body->setContactTestBitmask(0xFF);//½Ó´¥²âÊÔÑÚÂë
-	//body->setCollisionBitmask(0x01);//Åö×²ÑÚÂë
+	body->setContactTestBitmask(0x01);//½Ó´¥²âÊÔÑÚÂë
+	body->setCollisionBitmask(0x00);//Åö×²ÑÚÂë
+	body->setCategoryBitmask(0x03);//Àà±ðÑÚÂë
 	size = _player->getContentSize().width;
 	log("size:%f", _player->getContentSize().width);
 	_player->setPhysicsBody(body);

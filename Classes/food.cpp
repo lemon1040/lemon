@@ -20,8 +20,9 @@ void thefood::foodinit(const char *_ptr,int Tag)
 	auto food = Sprite::create(_ptr);
 	food->setTag(Tag);
 	auto body = PhysicsBody::createCircle(food->getContentSize().width / 2);
-	body->setContactTestBitmask(0xFFFFFFFF);//½Ó´¥²âÊÔÑÚÂë
-	//body->setCollisionBitmask(0x01);//Åö×²ÑÚÂë
+	body->setContactTestBitmask(0x02);//½Ó´¥²âÊÔÑÚÂë
+	body->setCollisionBitmask(0x01);//Åö×²ÑÚÂë
+	body->setCategoryBitmask(0x01);//Àà±ðÑÚÂë
 	food->setPhysicsBody(body);
 	addChild(food);
 }

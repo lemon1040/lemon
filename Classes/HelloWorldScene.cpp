@@ -6,6 +6,9 @@ USING_NS_CC;
 
 using namespace cocostudio::timeline;
 
+using namespace CocosDenshion;
+
+
 Scene* HelloWorld::createScene()
 {
     // 'scene' is an autorelease object
@@ -83,7 +86,7 @@ bool HelloWorld::init()
         return false;
     }
 	// 创建标签
-	auto label = LabelTTF::create("help", "Helvetica", 18);
+	auto label = LabelTTF::create("EXIT", "Helvetica", 18);
 	label->setPosition(1104,100);
 
 	//加入背景图片
@@ -96,36 +99,37 @@ bool HelloWorld::init()
 	auto pbutton = MenuItemImage::create(
 		"start.png",
 		"start2.png",
-		CC_CALLBACK_1(HelloWorld::menuStartCallback, this));
+		CC_CALLBACK_1(HelloWorld::menuSettingCallback, this));
 	auto startmenu = Menu::create(pbutton, NULL);
-	//帮助与设置
+	//关闭
 	auto pbutton2 = MenuItemImage::create(
 		"HELP.png",
 		"HELP2.png",
-		CC_CALLBACK_1(HelloWorld::menuSettingCallback, this));
-	auto helpmenu = Menu::create(pbutton2, NULL);
-	//关闭
-	auto pbutton3 = MenuItemImage::create(
-		"CloseNormal.png",
-		"CloseSelected.png",
 		CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-	auto closemenu = Menu::create(pbutton3, NULL);
+	auto exitmenu = Menu::create(pbutton2, NULL);
+	//关闭
+	
 
 	startmenu->setPosition(1104, 160);
-	helpmenu->setPosition(1104, 100);
-	closemenu->setPosition(2180, 30);
+	exitmenu->setPosition(1104, 100);
 	addChild(startmenu);
-	addChild(helpmenu);
-	addChild(closemenu);
+	addChild(exitmenu);
 	addChild(label);
 
 
+
+	if (UserDefault::getInstance()->getBoolForKey(MUSIC_KEY)) {
+		SimpleAudioEngine::getInstance()->playBackgroundMusic("sound/Bgm.mp3", true);
+	}
 
     return true;
 }
 void HelloWorld::menuCloseCallback(Ref *pSender)
 {
 	Director::getInstance()->end();
+	if (UserDefault::getInstance()->getBoolForKey(SOUND_KEY)) {
+		SimpleAudioEngine::getInstance()->playEffect("sound/Blip.wav");
+	}
 }
 
 void HelloWorld::menuSettingCallback(Ref *pSender)
@@ -133,10 +137,9 @@ void HelloWorld::menuSettingCallback(Ref *pSender)
 	auto sc = Setting::createScene();
 	auto reScene = TransitionSlideInL::create(0.5f, sc);
 	Director::getInstance()->pushScene(reScene);
+	if (UserDefault::getInstance()->getBoolForKey(SOUND_KEY)) {
+		SimpleAudioEngine::getInstance()->playEffect("sound/Blip.wav");
+	}
 }
-void HelloWorld::menuStartCallback(Ref *pSender)
-{
-	auto sc = Start::createScene();
-	auto reScene = TransitionSlideInL::create(0.5f, sc);
-	Director::getInstance()->pushScene(reScene);
-}
+
+

@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include"HelloWorldScene.h"
+#include"Music.h"
 class Setting : public cocos2d::Layer
 {
 public:
@@ -16,7 +17,7 @@ public:
 	void menuSoundToggleCallback(cocos2d::Ref* pSender);
 	void menuMusicToggleCallback(cocos2d::Ref* pSender);
 	void menuOkCallback(cocos2d::Ref* pSender);
-
+	void menuStartCallback(Ref *pSender);
 	// implement the "static create()" method manually
 	CREATE_FUNC(Setting);
 };
