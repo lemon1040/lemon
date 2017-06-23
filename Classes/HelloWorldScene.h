@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "SettingScene.h"
 #include"StartScene.h"
+#include"Music.h"
 class HelloWorld : public cocos2d::Layer
 {
 public:
@@ -14,7 +15,6 @@ public:
     virtual bool init();
 	void menuCloseCallback(cocos2d::Ref *pSender);
 	void menuSettingCallback(cocos2d::Ref *pSender);
-	void menuStartCallback(Ref *pSender);
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
 };

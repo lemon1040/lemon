@@ -27,11 +27,11 @@ bool AppDelegate::applicationDidFinishLaunching() {
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();
     if(!glview) {
-        glview = GLViewImpl::createWithRect("NewCocosProject", Rect(0, 0, 1600, 600));
+        glview = GLViewImpl::createWithRect("NewCocosProject", Rect(0, 0, 2208, 1242));
         director->setOpenGLView(glview);
     }
 
-    director->getOpenGLView()->setDesignResolutionSize(1600, 600, ResolutionPolicy::SHOW_ALL);
+    director->getOpenGLView()->setDesignResolutionSize(2208, 1242, ResolutionPolicy::SHOW_ALL);
 
     // turn on display FPS
     director->setDisplayStats(true);
@@ -46,10 +46,17 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
     // run
     director->runWithScene(scene);
-	//初始化背景音乐
-	SimpleAudioEngine::getInstance()->preloadBackgroundMusic("sound/gate.ogg");
-	//初始化音效
-	SimpleAudioEngine::getInstance()->preloadEffect("sound/Blip.wav");
+	//初始化背景音乐（BackgroundMusic)
+	SimpleAudioEngine::getInstance()->preloadBackgroundMusic("sound/Bgm.mp3");
+	SimpleAudioEngine::getInstance()->preloadBackgroundMusic("sound/End.mp3");
+
+	//初始化音效(Effect)
+	SimpleAudioEngine::getInstance()->preloadEffect("sound/Blip.wav");//按键音效
+	SimpleAudioEngine::getInstance()->preloadEffect("sound/Division.wav");//分裂
+	SimpleAudioEngine::getInstance()->preloadEffect("sound/EatingFood.mp3");//吃小球
+	SimpleAudioEngine::getInstance()->preloadEffect("sound/EatingPlayer.mp3");//吃玩家
+	SimpleAudioEngine::getInstance()->preloadEffect("sound/Win.wav");//胜利
+	SimpleAudioEngine::getInstance()->preloadEffect("sound/Wall.wav");//撞墙
     return true;
 }
 
